@@ -2,16 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\CategoryRepository;
+use App\Repository\ProfessionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: CategoryRepository::class)]
-#[ORM\Table("categories")]
+#[ORM\Entity(repositoryClass: ProfessionRepository::class)]
+#[ORM\Table("professions")]
 #[ORM\HasLifecycleCallbacks]
-class Category
+class Profession
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -19,18 +19,14 @@ class Category
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private Uuid $id;
 
-    #[ORM\Column(name: "parent_id", type: UuidType::NAME, nullable: true)]
-    private ?Uuid $parentId = null;
+    #[ORM\Column(length: 255, nullable: false)]
+    private string $name;
 
-    #[ORM\Column(length: 255, unique: true)]
-    private ?string $title;
+    #[ORM\Column(name: "user_id", type: 'uuid', nullable: false)]
+    private Uuid $userId;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $description = null;
-
-    #[ORM\Column(name: "category_type_id", type: 'uuid')]
-    #[ORM\OneToOne(targetEntity: CategoryType::class)]
-    private ?Uuid $categoryTypeId;
+    #[ORM\Column(name: "category_id", type: 'uuid', nullable: false)]
+    private Uuid $categoryId;
 
     #[ORM\Column(name: "created_at", type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
@@ -50,50 +46,38 @@ class Category
         return $this;
     }
 
-    public function getParentId(): ?Uuid
+    public function getName(): ?string
     {
-        return $this->parentId;
+        return $this->name;
     }
 
-    public function setParentId(?Uuid $parentId): static
+    public function setName(string $name): static
     {
-        $this->parentId = $parentId;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getUserId(): ?Uuid
     {
-        return $this->title;
+        return $this->userId;
     }
 
-    public function setTitle(string $title): static
+    public function setUserId(Uuid $userId): static
     {
-        $this->title = $title;
+        $this->userId = $userId;
 
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getCategoryId(): ?Uuid
     {
-        return $this->description;
+        return $this->categoryId;
     }
 
-    public function setDescription(?string $description): static
+    public function setCategoryId(Uuid $categoryId): static
     {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getCategoryTypeId(): ?Uuid
-    {
-        return $this->categoryTypeId;
-    }
-
-    public function setCategoryTypeId(Uuid $categoryTypeId): static
-    {
-        $this->categoryTypeId = $categoryTypeId;
+        $this->categoryId = $categoryId;
 
         return $this;
     }

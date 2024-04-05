@@ -20,13 +20,11 @@ class UserService
     private Uuid $id;
 
     #[ORM\Column(name: "user_id", type: UuidType::NAME, unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[ORM\OneToOne(targetEntity: User::class)]
     private Uuid $userId;
 
     #[ORM\Column(name: "category_id", type: UuidType::NAME, unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[ORM\OneToOne(targetEntity: Category::class)]
     private Uuid $categoryId;
 
     #[ORM\Column(length: 255)]

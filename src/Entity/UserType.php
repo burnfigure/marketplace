@@ -2,35 +2,41 @@
 
 namespace App\Entity;
 
-use App\Repository\CategoryRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use App\Repository\UserTypeRepository;
+use App\Validator\Name;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: CategoryRepository::class)]
-#[ORM\Table("categories")]
+#[ORM\Entity(repositoryClass: UserTypeRepository::class)]
+#[ORM\Table("user_types")]
 #[ORM\HasLifecycleCallbacks]
-class Category
+#[ApiResource(
+    operations: [
+        new Get(uriTemplate: '/usertypes/{id}', normalizationContext: ['groups' => 'usertype:item'], validate: true),
+        new GetCollection(uriTemplate: '/usertypes', options: ['offset'], normalizationContext: ['groups' => 'usertype:list']),
+    ],
+    formats: ['json'],
+    paginationItemsPerPage: 5,
+)]
+class UserType
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups(['usertype:list', 'usertype:item'])]
     private Uuid $id;
 
-    #[ORM\Column(name: "parent_id", type: UuidType::NAME, nullable: true)]
-    private ?Uuid $parentId = null;
-
-    #[ORM\Column(length: 255, unique: true)]
-    private ?string $title;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $description = null;
-
-    #[ORM\Column(name: "category_type_id", type: 'uuid')]
-    #[ORM\OneToOne(targetEntity: CategoryType::class)]
-    private ?Uuid $categoryTypeId;
+    #[ORM\Column(length: 255)]
+    #[Groups(['usertype:list', 'usertype:item'])]
+    #[Name]
+    private string $name;
 
     #[ORM\Column(name: "created_at", type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
@@ -50,50 +56,14 @@ class Category
         return $this;
     }
 
-    public function getParentId(): ?Uuid
+    public function getName(): ?string
     {
-        return $this->parentId;
+        return $this->name;
     }
 
-    public function setParentId(?Uuid $parentId): static
+    public function setName(string $name): static
     {
-        $this->parentId = $parentId;
-
-        return $this;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): static
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getCategoryTypeId(): ?Uuid
-    {
-        return $this->categoryTypeId;
-    }
-
-    public function setCategoryTypeId(Uuid $categoryTypeId): static
-    {
-        $this->categoryTypeId = $categoryTypeId;
+        $this->name = $name;
 
         return $this;
     }
